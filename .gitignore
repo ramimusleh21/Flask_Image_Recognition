@@ -1,0 +1,15 @@
+# Python virtual environment
+.venv/
+
+# Python generated files
+__pycache__/
+*.pyc
+
+# IDE configuration
+.idea/
+
+# Pytest cache
+.pytest_cache/
+
+# Pylint cache
+.pylint.d/
