@@ -1,29 +1,29 @@
 # test_acceptance_happy.py
 
+from unittest.mock import patch
 from io import BytesIO
 import pytest
 
 def test_acceptance_successful_upload(client):
-    """
-    Test Case: Successful Upload of a Valid Image File
-    - Purpose: Ensure the application accepts a valid image file upload and provides a prediction.
-    - Method:
-        - Create a mock valid image file with minimal valid data.
-        - Simulate a POST request to the `/prediction` route with the file.
-        - Assert the response status code is 200.
-        - Verify that the response data includes the keyword 'Prediction.'
-    """
-    img_data = BytesIO(b"fake_image_data")  # Simulated valid image data
-    img_data.name = "test_image.jpg"
+    """Verify that a successful upload displays the predicted digit."""
 
-    response = client.post(
-        "/prediction",
-        data={"file": (img_data, img_data.name)},
-        content_type="multipart/form-data"
-    )
+    with patch("app.preprocess_img", return_value="processed-image") as mock_preprocess, \
+         patch("app.predict_result", return_value=7) as mock_predict:
+
+        img_data = BytesIO(b"mock_image_data")
+
+        response = client.post(
+            "/prediction",
+            data={"file": (img_data, "test_image.jpg")},
+            content_type="multipart/form-data"
+        )
 
     assert response.status_code == 200
-    assert b"Prediction" in response.data
+    assert b">7</h2>" in response.data
+    assert b"File cannot be processed." not in response.data
+
+    mock_preprocess.assert_called_once()
+    mock_predict.assert_called_once_with("processed-image")
 
 
 def test_acceptance_valid_large_image(client):
