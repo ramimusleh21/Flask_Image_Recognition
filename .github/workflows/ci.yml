@@ -29,7 +29,7 @@ jobs:
 
       - name: Run Pylint
         run: |
-          python -m pylint app.py model.py
+          python -m pylint app.py model.py conftest.py
 
       - name: Run all pytest tests
         run: |
