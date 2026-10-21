@@ -1,6 +1,8 @@
 import os
 import pytest
 import numpy as np
+from io import BytesIO
+from PIL import Image
 from keras.models import load_model
 from model import preprocess_img, predict_result  # Adjust based on your structure
 
@@ -66,3 +68,17 @@ def test_model_predictions_consistency(model):
 
     # Check that all predictions are the same
     assert all(p == predictions[0] for p in predictions), "Predictions for the same input should be consistent"
+
+def test_preprocess_grayscale_image():
+    """Verify that a grayscale image is prepared with three color channels."""
+    image = Image.new("L", (20, 20), color=128)
+
+    image_bytes = BytesIO()
+    image.save(image_bytes, format="PNG")
+    image_bytes.seek(0)
+
+    processed_img = preprocess_img(image_bytes)
+
+    assert processed_img.shape == (1, 224, 224, 3)
+    assert np.min(processed_img) >= 0
+    assert np.max(processed_img) <= 1
